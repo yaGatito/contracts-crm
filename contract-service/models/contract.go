@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Contract struct {
 	ID uint `gorm:"primaryKey"`
@@ -12,15 +14,15 @@ type Contract struct {
 }
 
 type ContractLegalPerson struct {
-	ID uint `gorm:"primaryKey"`
+	ContractID    uint `gorm:"primaryKey"`
+	LegalPersonID uint `gorm:"primaryKey"`
 
-	ContractID    uint `gorm:"not null"`
-	LegalPersonID uint `gorm:"not null"`
+	LegalPerson LegalPerson `gorm:"foreignKey:LegalPersonID"`
 }
 
 type ContractPerson struct {
-	ID uint `gorm:"primaryKey"`
+	ContractID uint `gorm:"primaryKey"`
+	PersonID   uint `gorm:"primaryKey"`
 
-	ContractID uint `gorm:"not null"`
-	PersonID   uint `gorm:"not null"`
+	Person Person `gorm:"foreignKey:PersonID"`
 }

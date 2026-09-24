@@ -32,6 +32,10 @@ func (r *ContractRepository) Get(ctx context.Context, id uint) (*models.Contract
 	return &contract, nil
 }
 
+func (r *ContractRepository) Update(ctx context.Context, contract *models.Contract) error {
+	return r.db.WithContext(ctx).Updates(contract).Error
+}
+
 func (r *ContractRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.Contract{}, id).Error
 }

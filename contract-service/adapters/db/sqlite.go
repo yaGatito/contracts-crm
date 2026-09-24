@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewSQLite(path string) (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
+func NewSQLite() (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open("app.db"), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -18,6 +18,8 @@ func NewSQLite(path string) (*gorm.DB, error) {
 		&models.Person{},
 		&models.LegalPerson{},
 		&models.Contract{},
+		&models.ContractPerson{},
+		&models.ContractLegalPerson{},
 	)
 	if err != nil {
 		log.Fatal(err)

@@ -17,20 +17,39 @@ func NewContractLegalPersonRepository(db *gorm.DB) *ContractLegalPersonRepositor
 	return &ContractLegalPersonRepository{db: db}
 }
 
-func (r *ContractLegalPersonRepository) Save(ctx context.Context, contract *models.Contract) error {
+func (r *ContractLegalPersonRepository) Save(ctx context.Context, contract *models.ContractLegalPerson) error {
 	return r.db.WithContext(ctx).Save(contract).Error
 }
 
-func (r *ContractLegalPersonRepository) Get(ctx context.Context, id uint) (*models.Contract, error) {
-	var contract models.Contract
+func (r *ContractLegalPersonRepository) GetLegalPersonsByContractID(ctx context.Context, contractId uint) ([]models.LegalPerson, error) {
+	var relations []models.ContractLegalPerson
 
-	if err := r.db.WithContext(ctx).First(&contract, id).Error; err != nil {
+	err := r.db.WithContext(ctx).
+		Preload("LegalPerson").
+		Where(models.ContractLegalPerson{ContractID: contractId}).
+		Find(&relations).Error
+
+	if err != nil {
 		return nil, err
 	}
 
-	return &contract, nil
+	legalPersons := make([]models.LegalPerson, 0, len(relations))
+	for _, relation := range relations {
+		legalPersons = append(legalPersons, relation.LegalPerson)
+	}
+
+	return legalPersons, nil
 }
 
-func (r *ContractLegalPersonRepository) Delete(ctx context.Context, id uint) error {
-	return r.db.WithContext(ctx).Delete(&models.Contract{}, id).Error
+func (r *ContractLegalPersonRepository) Delete(
+	ctx context.Context,
+	contractID uint,
+	legalPersonID uint,
+) error {
+	return r.db.WithContext(ctx).
+		Where(models.ContractLegalPerson{
+			ContractID:    contractID,
+			LegalPersonID: legalPersonID,
+		}).
+		Delete(&models.ContractLegalPerson{}).Error
 }
