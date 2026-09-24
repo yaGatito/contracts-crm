@@ -1,9 +1,11 @@
-package domain
+package models
 
 import "time"
 
 type Contract struct {
-	Number    int64
+	ID uint `gorm:"primaryKey"`
+
+	Number    int64 `gorm:"uniqueIndex"`
 	StartDate time.Time
 	EndDate   time.Time
 	Type      string
