@@ -1,7 +1,10 @@
 package httpadapter
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -51,10 +54,20 @@ func (h *Handlers) Register(router *gin.Engine) {
 
 func (h *Handlers) createPerson(c *gin.Context) {
 	var dto Person
+
+	// Read raw body for debugging (log it) and then reset the body for binding
+	if data, err := io.ReadAll(c.Request.Body); err == nil {
+		log.Printf("createPerson raw body: %s", string(data))
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(data))
+	}
+
 	if err := c.ShouldBindJSON(&dto); err != nil {
+		log.Printf("createPerson bind error: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	log.Printf("createPerson after bind: %+v", dto)
 
 	if err := validatePerson(dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -68,9 +81,11 @@ func (h *Handlers) createPerson(c *gin.Context) {
 		return
 	}
 
+	log.Printf("createPerson created: %+v", person)
+
 	log.Printf("saved person with id: %d", person.ID)
 
-	c.JSON(http.StatusCreated, person)
+	c.JSON(http.StatusCreated, personToDto(person))
 }
 
 func (h *Handlers) searchPersonContracts(c *gin.Context) {
@@ -94,7 +109,14 @@ func (h *Handlers) searchPersonContracts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, contracts)
+	fmt.Printf("contracts len %d", len(contracts))
+
+	dtos := make([]Contract, len(contracts))
+	for i, c := range contracts {
+		dtos[i] = contractToDto(c)
+	}
+
+	c.JSON(http.StatusOK, dtos)
 }
 
 func (h *Handlers) getPerson(c *gin.Context) {
@@ -145,7 +167,7 @@ func (h *Handlers) createLegalPerson(c *gin.Context) {
 
 	log.Printf("saved legal person with id: %d", legalPerson.ID)
 
-	c.JSON(http.StatusCreated, legalPerson)
+	c.JSON(http.StatusCreated, legalPersonToDto(legalPerson))
 }
 
 func (h *Handlers) searchLegalPersonContracts(c *gin.Context) {
@@ -170,7 +192,14 @@ func (h *Handlers) searchLegalPersonContracts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, contracts)
+	fmt.Printf("contracts len %d", len(contracts))
+
+	dtos := make([]Contract, len(contracts))
+	for i, c := range contracts {
+		dtos[i] = contractToDto(c)
+	}
+
+	c.JSON(http.StatusOK, dtos)
 }
 
 func (h *Handlers) getLegalPerson(c *gin.Context) {
@@ -221,7 +250,7 @@ func (h *Handlers) createContract(c *gin.Context) {
 
 	log.Printf("saved contract with id: %d", contract.ID)
 
-	c.JSON(http.StatusCreated, contract)
+	c.JSON(http.StatusCreated, contractToDto(contract))
 }
 
 func (h *Handlers) getContract(c *gin.Context) {
@@ -236,7 +265,7 @@ func (h *Handlers) getContract(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, details)
+	c.JSON(http.StatusOK, contractDetailsToDto(details))
 }
 
 func (h *Handlers) updateContract(c *gin.Context) {

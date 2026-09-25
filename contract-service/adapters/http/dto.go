@@ -52,6 +52,30 @@ type SearchLegalPersonContractsFilter struct {
 	LocalEDRPOU          uint32 `json:"legal_edrpou"`
 }
 
+type ContractDetails struct {
+    Contract     Contract      `json:"contract"`
+    Persons      []Person      `json:"persons"`
+    LegalPersons []LegalPerson `json:"legal_persons"`
+}
+
+func contractDetailsToDto(details models.ContractDetails) ContractDetails {
+	result := ContractDetails{
+		Contract:     contractToDto(details.Contract),
+		Persons:      make([]Person, len(details.Persons)),
+		LegalPersons: make([]LegalPerson, len(details.LegalPersons)),
+	}
+
+	for i, p := range details.Persons {
+		result.Persons[i] = personToDto(p)
+	}
+
+	for i, lp := range details.LegalPersons {
+		result.LegalPersons[i] = legalPersonToDto(lp)
+	}
+
+	return result
+}
+
 func personToDto(p models.Person) Person {
 	return Person{
 		ID:          p.ID,
