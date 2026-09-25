@@ -111,10 +111,14 @@ function SearchPage() {
             ) : (
               <ul className="list">
                 {personResults.map((contract) => (
-                  <li key={contract.ID} className="item">
+                  <li key={contract.id} className="item">
                     <div className="item-main">
-                      <span className="item-title">#{contract.Number} • {contract.Type || 'No type'}</span>
-                      <span className="item-meta">ID: {contract.ID} • {formatDate(contract.StartDate)} – {formatDate(contract.EndDate)}</span>
+                      <span className="item-title">
+                        #{contract.number} • {contract.type || 'No type'}
+                      </span>
+                      <span className="item-meta">
+                        ID: {contract.id} • {formatDate(contract.start_date)} – {formatDate(contract.end_date)}
+                      </span>
                     </div>
                   </li>
                 ))}
@@ -141,10 +145,14 @@ function SearchPage() {
             ) : (
               <ul className="list">
                 {legalResults.map((contract) => (
-                  <li key={contract.ID} className="item">
+                  <li key={contract.id} className="item">
                     <div className="item-main">
-                      <span className="item-title">#{contract.Number} • {contract.Type || 'No type'}</span>
-                      <span className="item-meta">ID: {contract.ID} • {formatDate(contract.StartDate)} – {formatDate(contract.EndDate)}</span>
+                      <span className="item-title">
+                        #{contract.number} • {contract.type || 'No type'}
+                      </span>
+                      <span className="item-meta">
+                        ID: {contract.id} • {formatDate(contract.start_date)} – {formatDate(contract.end_date)}
+                      </span>
                     </div>
                   </li>
                 ))}

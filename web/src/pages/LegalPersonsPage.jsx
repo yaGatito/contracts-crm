@@ -58,18 +58,18 @@ function LegalPersonsPage() {
     await fetch(`/legal-persons/${deleteId}`, { method: 'DELETE' })
     setItems((current) => current.filter((it) => String(it.ID ?? it.id) !== String(deleteId)))
     setDeleteId('')
-    if (selected && String(selected.ID ?? selected.id) === String(deleteId)) {
+    if (selected && String(selected.id) === String(deleteId)) {
       setSelected(null)
     }
   }
 
   const selectedLegalPerson = selected ? {
-    id: selected.ID ?? selected.id,
-    name: selected.name ?? selected.Name,
-    shortname: selected.shortname ?? selected.ShortName,
-    registered_at: selected.registered_at ?? selected.RegisteredAt,
-    local_kwed: selected.local_kwed ?? selected.LocalKWED,
-    local_edrpou: selected.local_edrpou ?? selected.LocalERDPOU ?? selected.LocalEDRPOU,
+    id: selected.id,
+    name: selected.name,
+    shortname: selected.shortname,
+    registered_at: selected.registered_at,
+    local_kwed: selected.local_kwed,
+    local_edrpou: selected.local_edrpou,
   } : null
 
   return (
@@ -124,14 +124,14 @@ function LegalPersonsPage() {
           <h3>Recent legal persons</h3>
           <ul className="list">
             {items.map((item) => {
-              const shortName = item.ShortName ?? item.shortname ?? ''
-              const erdPou = item.LocalERDPOU ?? item.LocalEDRPOU ?? item.local_edrpou ?? item.local_erdpou ?? ''
+              const shortName = item.shortname ?? ''
+              const erdPou = item.local_edrpou ?? ''
 
               return (
-                <li key={item.ID ?? item.id} className="item">
+                <li key={item.id} className="item">
                   <div className="item-main">
-                    <span className="item-title">{item.Name ?? item.name}</span>
-                    <span className="item-meta">ID: {item.ID ?? item.id} • Short: {shortName || '—'} • ERDPOU: {erdPou || '—'}</span>
+                    <span className="item-title">{item.name}</span>
+                    <span className="item-meta">ID: {item.id} • Short: {shortName || '—'} • ERDPOU: {erdPou || '—'}</span>
                   </div>
                 </li>
               )

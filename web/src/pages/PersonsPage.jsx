@@ -4,6 +4,7 @@ const emptyForm = {
   lastname: '',
   name: '',
   patronym: '',
+  local_rnokpp: '',
   date_of_birth: '',
 }
 
@@ -26,6 +27,7 @@ function PersonsPage() {
     const payload = {
       ...form,
       date_of_birth: form.date_of_birth ? new Date(form.date_of_birth).toISOString() : '',
+      local_rnokpp: form.local_rnokpp ? Number(form.local_rnokpp) : 0,
     }
 
     const res = await fetch('/persons', {
@@ -55,17 +57,18 @@ function PersonsPage() {
     await fetch(`/persons/${deleteId}`, { method: 'DELETE' })
     setItems((current) => current.filter((it) => String(it.ID ?? it.id) !== String(deleteId)))
     setDeleteId('')
-    if (selected && String(selected.ID ?? selected.id) === String(deleteId)) {
+    if (selected && String(selected.id) === String(deleteId)) {
       setSelected(null)
     }
   }
 
   const selectedPerson = selected ? {
-    id: selected.ID ?? selected.id,
-    lastname: selected.lastname ?? selected.Lastname,
-    name: selected.name ?? selected.Name,
-    patronym: selected.patronym ?? selected.Patronym,
-    date_of_birth: selected.date_of_birth ?? selected.DateOfBirth,
+    id: selected.id,
+    lastname: selected.lastname,
+    name: selected.name,
+    patronym: selected.patronym,
+    local_rnokpp: selected.local_rnokpp,
+    date_of_birth: selected.date_of_birth,
   } : null
 
   return (
@@ -81,6 +84,7 @@ function PersonsPage() {
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" required />
             <input value={form.lastname} onChange={(e) => setForm({ ...form, lastname: e.target.value })} placeholder="Lastname" required />
             <input value={form.patronym} onChange={(e) => setForm({ ...form, patronym: e.target.value })} placeholder="Patronym" />
+            <input value={form.local_rnokpp} onChange={(e) => setForm({ ...form, local_rnokpp: e.target.value })} placeholder="Local RNOKPP" />
             <input type="date" value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} />
             <button className="primary-btn" type="submit">Create</button>
           </form>
@@ -94,7 +98,7 @@ function PersonsPage() {
             {selectedPerson ? (
               <div className="item-main">
                 <span className="tag">ID {selectedPerson.id}</span>
-                <div className="item-title">{selectedPerson.lastname} {selectedPerson.name} {selectedPerson.patronym}</div>
+                <div className="item-title">{selectedPerson.lastname} {selectedPerson.name} {selectedPerson.patronym} {selectedPerson.local_rnokpp}</div>
                 <div className="item-meta">Date of birth: {formatDate(selectedPerson.date_of_birth)}</div>
               </div>
             ) : (
@@ -119,7 +123,7 @@ function PersonsPage() {
             {items.map((person) => (
               <li key={person.ID ?? person.id} className="item">
                 <div className="item-main">
-                  <span className="item-title">{person.Lastname ?? person.lastname} {person.Name ?? person.name} {person.Patronym ?? person.patronym}</span>
+                  <span className="item-title">{person.lastname} {person.name} {person.patronym} {person.local_rnokpp} </span>
                   <span className="item-meta">ID: {person.ID ?? person.id} • {formatDate(person.DateOfBirth ?? person.date_of_birth)}</span>
                 </div>
               </li>

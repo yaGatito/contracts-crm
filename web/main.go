@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
-	"net/http"
-	"os"
-	"path/filepath"
 
 	sqlitedb "contract-service/adapters/db"
 	httpadapter "contract-service/adapters/http"
@@ -16,6 +14,9 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
+
+//go:embed dist
+var assets embed.FS
 
 type App struct {
 	server *gin.Engine
@@ -48,10 +49,12 @@ func NewApp() *App {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
+
 		c.Next()
 	})
 
@@ -79,15 +82,7 @@ func main() {
 			app.Start(ctx)
 		},
 		AssetServer: &assetserver.Options{
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				frontendDir := filepath.Join(".", "dist")
-				if _, err := os.Stat(filepath.Join(frontendDir, "index.html")); err == nil {
-					http.FileServer(http.Dir(frontendDir)).ServeHTTP(w, r)
-					return
-				}
-				w.Header().Set("Content-Type", "text/html; charset=utf-8")
-				_, _ = w.Write([]byte("<html><body><h1>Contracts CRM Desktop</h1><p>Frontend bundle not found.</p></body></html>"))
-			}),
+			Assets: assets,
 		},
 	}); err != nil {
 		log.Fatal(err)

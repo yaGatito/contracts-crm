@@ -59,7 +59,7 @@ function ContractsPage() {
     await fetch(`/contracts/${deleteId}`, { method: 'DELETE' })
     setItems((current) => current.filter((it) => String(it.ID) !== String(deleteId)))
     setDeleteId('')
-    if (selected && selected.Contract && String(selected.Contract.ID) === String(deleteId)) {
+    if (selected && selected.contract && String(selected.contract.ID) === String(deleteId)) {
       setSelected(null)
     }
   }
@@ -125,11 +125,11 @@ function ContractsPage() {
             <button className="secondary-btn" onClick={handleGet}>Get</button>
             {selected ? (
               <div className="item-main">
-                <span className="tag">ID {selected.Contract?.ID}</span>
-                <div className="item-title">#{selected.Contract?.Number}</div>
-                <div className="item-meta">{selected.Contract?.Type || '—'}</div>
-                <div className="item-meta">From {formatDate(selected.Contract?.StartDate)} to {formatDate(selected.Contract?.EndDate)}</div>
-                <div className="item-meta">Persons: {selected.Persons?.length || 0} • Legal persons: {selected.LegalPersons?.length || 0}</div>
+                <span className="tag">ID {selected.contract?.id}</span>
+                <div className="item-title">#{selected.contract?.number}</div>
+                <div className="item-meta">{selected.contract?.type || '—'}</div>
+                <div className="item-meta">From {formatDate(selected.contract?.start_date)} to {formatDate(selected.contract?.end_date)}</div>
+                <div className="item-meta">Persons: {selected.persons?.length || 0} • Legal persons: {selected.legal_persons?.length || 0}</div>
               </div>
             ) : (
               <div className="empty">No contract selected</div>
@@ -171,12 +171,16 @@ function ContractsPage() {
           <h3>Recent contracts</h3>
           <ul className="list">
             {items.map((contract) => (
-              <li key={contract.ID} className="item">
-                <div className="item-main">
-                  <span className="item-title">#{contract.Number} • {contract.Type || 'No type'}</span>
-                  <span className="item-meta">ID: {contract.ID} • {formatDate(contract.StartDate)} – {formatDate(contract.EndDate)}</span>
-                </div>
-              </li>
+                  <li key={contract.id} className="item">
+                    <div className="item-main">
+                      <span className="item-title">
+                        #{contract.number} • {contract.type || 'No type'}
+                      </span>
+                      <span className="item-meta">
+                        ID: {contract.id} • {formatDate(contract.start_date)} – {formatDate(contract.end_date)}
+                      </span>
+                    </div>
+                  </li>
             ))}
           </ul>
         </section>
@@ -184,19 +188,19 @@ function ContractsPage() {
 
       {selected && (
         <section className="panel" style={{ marginTop: 20 }}>
-          <h3>Details for contract #{selected.Contract?.Number}</h3>
+          <h3>Details for contract #{selected.contract?.number}</h3>
           <div className="grid-2">
             <div>
               <h4>Persons</h4>
-              {selected.Persons?.length ? (
+              {selected.persons?.length ? (
                 <ul className="list">
-                  {selected.Persons.map((person) => (
+                  {selected.persons.map((person) => (
                     <li key={person.ID} className="item">
                       <div className="item-main">
-                        <span className="item-title">{person.Lastname} {person.Name} {person.Patronym}</span>
-                        <span className="item-meta">ID: {person.ID}</span>
+                        <span className="item-title">{person.lastname} {person.name} {person.patronym}</span>
+                        <span className="item-meta">ID: {person.id}</span>
                       </div>
-                      <button className="danger-btn" onClick={() => handleRemovePerson(selected.Contract.ID, person.ID)}>Remove</button>
+                      <button className="danger-btn" onClick={() => handleRemovePerson(selected.contract.id, person.id)}>Remove</button>
                     </li>
                   ))}
                 </ul>
@@ -207,15 +211,15 @@ function ContractsPage() {
 
             <div>
               <h4>Legal persons</h4>
-              {selected.LegalPersons?.length ? (
+              {selected.legalPersons?.length ? (
                 <ul className="list">
-                  {selected.LegalPersons.map((lp) => (
+                  {selected.legalPersons.map((lp) => (
                     <li key={lp.ID} className="item">
                       <div className="item-main">
-                        <span className="item-title">{lp.Name}</span>
-                        <span className="item-meta">ID: {lp.ID}</span>
+                        <span className="item-title">{lp.name}</span>
+                        <span className="item-meta">ID: {lp.id}</span>
                       </div>
-                      <button className="danger-btn" onClick={() => handleRemoveLegalPerson(selected.Contract.ID, lp.ID)}>Remove</button>
+                      <button className="danger-btn" onClick={() => handleRemoveLegalPerson(selected.contract.id, lp.id)}>Remove</button>
                     </li>
                   ))}
                 </ul>
