@@ -1,36 +1,39 @@
 package main
 
 import (
-	"context"
-	sqlitedb "contract-service/adapters/db"
-	"contract-service/models"
 	"log"
-	"time"
+
+	sqlitedb "contract-service/adapters/db"
+	httpadapter "contract-service/adapters/http"
+	"contract-service/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	db, err := sqlitedb.NewSQLite("app.db")
+	db, err := sqlitedb.NewSQLite()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	personRepo := sqlitedb.NewPersonRepository(db)
-	// legalPersonRepo := sqlitedb.NewLegalPersonRepository(db)
-	// contractRepo := sqlitedb.NewContractRepository(db)
+	legalPersonRepo := sqlitedb.NewLegalPersonRepository(db)
+	contractRepo := sqlitedb.NewContractRepository(db)
+	contractLegalPersonRepo := sqlitedb.NewContractLegalPersonRepository(db)
+	contractPersonRepo := sqlitedb.NewContractPersonRepository(db)
 
-	p := &models.Person{
-		Lastname:    "Bomj",
-		Name:        "Bomjara",
-		Patronym:    "Bomjarovi4",
-		DateOfBirth: time.Now(),
-		LocalRNOKPP: 1231211231,
-	}
+	svc := service.NewContractService(
+		personRepo,
+		legalPersonRepo,
+		contractRepo,
+		contractLegalPersonRepo,
+		contractPersonRepo,
+	)
 
-	err = personRepo.Save(context.Background(), p)
-	if err != nil {
+	router := gin.Default()
+	httpadapter.NewHandlers(svc).Register(router)
+
+	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
-
-	log.Println(p.ID)
-
 }
