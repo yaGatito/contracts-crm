@@ -2,6 +2,7 @@ import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom'
 import PersonsPage from './pages/PersonsPage'
 import LegalPersonsPage from './pages/LegalPersonsPage'
 import ContractsPage from './pages/ContractsPage'
+import SearchPage from './pages/SearchPage'
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
             <NavLink to="/contracts" className={({ isActive }) => 'nav-link ' + (isActive ? 'active' : '')}>
               Contracts
             </NavLink>
+            <NavLink to="/search" className={({ isActive }) => 'nav-link ' + (isActive ? 'active' : '')}>
+              Search
+            </NavLink>
           </nav>
         </header>
 
@@ -28,6 +32,7 @@ function App() {
             <Route path="/persons" element={<PersonsPage />} />
             <Route path="/legal-persons" element={<LegalPersonsPage />} />
             <Route path="/contracts" element={<ContractsPage />} />
+            <Route path="/search" element={<SearchPage />} />
           </Routes>
         </main>
       </div>

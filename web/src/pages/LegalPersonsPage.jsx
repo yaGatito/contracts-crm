@@ -56,12 +56,21 @@ function LegalPersonsPage() {
   const handleDelete = async () => {
     if (!deleteId) return
     await fetch(`/legal-persons/${deleteId}`, { method: 'DELETE' })
-    setItems((current) => current.filter((it) => String(it.ID) !== String(deleteId)))
+    setItems((current) => current.filter((it) => String(it.ID ?? it.id) !== String(deleteId)))
     setDeleteId('')
-    if (selected && String(selected.ID) === String(deleteId)) {
+    if (selected && String(selected.ID ?? selected.id) === String(deleteId)) {
       setSelected(null)
     }
   }
+
+  const selectedLegalPerson = selected ? {
+    id: selected.ID ?? selected.id,
+    name: selected.name ?? selected.Name,
+    shortname: selected.shortname ?? selected.ShortName,
+    registered_at: selected.registered_at ?? selected.RegisteredAt,
+    local_kwed: selected.local_kwed ?? selected.LocalKWED,
+    local_edrpou: selected.local_edrpou ?? selected.LocalERDPOU ?? selected.LocalEDRPOU,
+  } : null
 
   return (
     <div className="page-card">
@@ -87,13 +96,13 @@ function LegalPersonsPage() {
           <div className="form-grid">
             <input value={getId} onChange={(e) => setGetId(e.target.value)} placeholder="Legal person ID" />
             <button className="secondary-btn" onClick={handleGet}>Get</button>
-            {selected ? (
+            {selectedLegalPerson ? (
               <div className="item-main">
-                <span className="tag">ID {selected.ID}</span>
-                <div className="item-title">{selected.Name}</div>
-                <div className="item-meta">Short: {selected.ShortName || '—'}</div>
-                <div className="item-meta">Registered: {formatDate(selected.RegisteredAt)}</div>
-                <div className="item-meta">KWED: {selected.LocalKWED || '—'} • ERDPOU: {selected.LocalERDPOU || '—'}</div>
+                <span className="tag">ID {selectedLegalPerson.id}</span>
+                <div className="item-title">{selectedLegalPerson.name}</div>
+                <div className="item-meta">Short: {selectedLegalPerson.shortname || '—'}</div>
+                <div className="item-meta">Registered: {formatDate(selectedLegalPerson.registered_at)}</div>
+                <div className="item-meta">KWED: {selectedLegalPerson.local_kwed || '—'} • ERDPOU: {selectedLegalPerson.local_edrpou || '—'}</div>
               </div>
             ) : (
               <div className="empty">No legal person selected</div>
@@ -114,14 +123,19 @@ function LegalPersonsPage() {
         <section className="panel" style={{ marginTop: 20 }}>
           <h3>Recent legal persons</h3>
           <ul className="list">
-            {items.map((item) => (
-              <li key={item.ID} className="item">
-                <div className="item-main">
-                  <span className="item-title">{item.Name}</span>
-                  <span className="item-meta">ID: {item.ID} • Short: {item.ShortName || '—'} • ERDPOU: {item.LocalERDPOU || '—'}</span>
-                </div>
-              </li>
-            ))}
+            {items.map((item) => {
+              const shortName = item.ShortName ?? item.shortname ?? ''
+              const erdPou = item.LocalERDPOU ?? item.LocalEDRPOU ?? item.local_edrpou ?? item.local_erdpou ?? ''
+
+              return (
+                <li key={item.ID ?? item.id} className="item">
+                  <div className="item-main">
+                    <span className="item-title">{item.Name ?? item.name}</span>
+                    <span className="item-meta">ID: {item.ID ?? item.id} • Short: {shortName || '—'} • ERDPOU: {erdPou || '—'}</span>
+                  </div>
+                </li>
+              )
+            })}
           </ul>
         </section>
       )}

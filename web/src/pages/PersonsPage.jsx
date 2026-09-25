@@ -53,12 +53,20 @@ function PersonsPage() {
   const handleDelete = async () => {
     if (!deleteId) return
     await fetch(`/persons/${deleteId}`, { method: 'DELETE' })
-    setItems((current) => current.filter((it) => String(it.ID) !== String(deleteId)))
+    setItems((current) => current.filter((it) => String(it.ID ?? it.id) !== String(deleteId)))
     setDeleteId('')
-    if (selected && String(selected.ID) === String(deleteId)) {
+    if (selected && String(selected.ID ?? selected.id) === String(deleteId)) {
       setSelected(null)
     }
   }
+
+  const selectedPerson = selected ? {
+    id: selected.ID ?? selected.id,
+    lastname: selected.lastname ?? selected.Lastname,
+    name: selected.name ?? selected.Name,
+    patronym: selected.patronym ?? selected.Patronym,
+    date_of_birth: selected.date_of_birth ?? selected.DateOfBirth,
+  } : null
 
   return (
     <div className="page-card">
@@ -83,11 +91,11 @@ function PersonsPage() {
           <div className="form-grid">
             <input value={getId} onChange={(e) => setGetId(e.target.value)} placeholder="Person ID" />
             <button className="secondary-btn" onClick={handleGet}>Get</button>
-            {selected ? (
+            {selectedPerson ? (
               <div className="item-main">
-                <span className="tag">ID {selected.ID}</span>
-                <div className="item-title">{selected.Lastname} {selected.Name} {selected.Patronym}</div>
-                <div className="item-meta">Date of birth: {formatDate(selected.DateOfBirth)}</div>
+                <span className="tag">ID {selectedPerson.id}</span>
+                <div className="item-title">{selectedPerson.lastname} {selectedPerson.name} {selectedPerson.patronym}</div>
+                <div className="item-meta">Date of birth: {formatDate(selectedPerson.date_of_birth)}</div>
               </div>
             ) : (
               <div className="empty">No person selected</div>
@@ -109,10 +117,10 @@ function PersonsPage() {
           <h3>Recent persons</h3>
           <ul className="list">
             {items.map((person) => (
-              <li key={person.ID} className="item">
+              <li key={person.ID ?? person.id} className="item">
                 <div className="item-main">
-                  <span className="item-title">{person.Lastname} {person.Name} {person.Patronym}</span>
-                  <span className="item-meta">ID: {person.ID} • {formatDate(person.DateOfBirth)}</span>
+                  <span className="item-title">{person.Lastname ?? person.lastname} {person.Name ?? person.name} {person.Patronym ?? person.patronym}</span>
+                  <span className="item-meta">ID: {person.ID ?? person.id} • {formatDate(person.DateOfBirth ?? person.date_of_birth)}</span>
                 </div>
               </li>
             ))}
