@@ -1,0 +1,12 @@
+{
+  "$schema": "https://wails.io",
+  "name": "contracts-crm",
+  "outputfilename": "contracts-crm",
+  "frontend:dir": ".",
+  "devtools": true,
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverurl": "auto",
+  "author": {
+    "name": "gato"
+  }
+}
