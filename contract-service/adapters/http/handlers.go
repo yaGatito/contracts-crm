@@ -56,6 +56,11 @@ func (h *Handlers) createPerson(c *gin.Context) {
 		return
 	}
 
+	if err := validatePerson(dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	person := dtoToPerson(dto)
 
 	if err := h.service.CreatePerson(context.Background(), &person); err != nil {
@@ -127,7 +132,10 @@ func (h *Handlers) createLegalPerson(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	if err := validateLegalPerson(dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	legalPerson := dtoToLegalPerson(dto)
 
 	if err := h.service.CreateLegalPerson(context.Background(), &legalPerson); err != nil {
@@ -200,7 +208,10 @@ func (h *Handlers) createContract(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	if err := validateContract(dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	contract := dtoToContract(dto)
 
 	if err := h.service.CreateContract(context.Background(), &contract); err != nil {
@@ -278,6 +289,10 @@ func (h *Handlers) addPersonToContract(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if relation.PersonID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "person_id is required"})
+		return
+	}
 
 	if err := h.service.AddPersonToContract(c.Request.Context(), contractID, relation.PersonID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -317,6 +332,10 @@ func (h *Handlers) addLegalPersonToContract(c *gin.Context) {
 	}
 	if err := c.ShouldBindJSON(&relation); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if relation.LegalPersonID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "legal_person_id is required"})
 		return
 	}
 

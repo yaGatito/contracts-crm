@@ -159,7 +159,7 @@ func (r *ContractRepository) SearchPersonContracts(
 	query := r.db.WithContext(ctx).
 		Model(&models.Contract{}).
 		Joins(`
-			JOIN contract_persons cp
+			JOIN contract_people cp
 				ON cp.contract_id = contracts.id
 		`).
 		Joins(`

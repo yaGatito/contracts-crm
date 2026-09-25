@@ -78,8 +78,8 @@ function PersonsPage() {
         <section className="panel">
           <h3>Create person</h3>
           <form className="form-grid" onSubmit={handleCreate}>
-            <input value={form.lastname} onChange={(e) => setForm({ ...form, lastname: e.target.value })} placeholder="Lastname" required />
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" required />
+            <input value={form.lastname} onChange={(e) => setForm({ ...form, lastname: e.target.value })} placeholder="Lastname" required />
             <input value={form.patronym} onChange={(e) => setForm({ ...form, patronym: e.target.value })} placeholder="Patronym" />
             <input type="date" value={form.date_of_birth} onChange={(e) => setForm({ ...form, date_of_birth: e.target.value })} />
             <button className="primary-btn" type="submit">Create</button>
