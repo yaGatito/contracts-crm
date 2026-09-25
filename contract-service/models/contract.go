@@ -7,7 +7,7 @@ import (
 type Contract struct {
 	ID uint `gorm:"primaryKey"`
 
-	Number    int64 `gorm:"uniqueIndex"`
+	Number    uint64 `gorm:"uniqueIndex"`
 	StartDate time.Time
 	EndDate   time.Time
 	Type      string
@@ -25,4 +25,31 @@ type ContractPerson struct {
 	PersonID   uint `gorm:"primaryKey"`
 
 	Person Person `gorm:"foreignKey:PersonID"`
+}
+
+type ContractDetails struct {
+	Contract     Contract
+	Persons      []Person
+	LegalPersons []LegalPerson
+}
+
+type SearchPersonContractsFilter struct {
+	ContractType  string
+	StartDateFrom time.Time
+	StartDateTo   time.Time
+
+	PersonName        string
+	PersonLastname    string
+	PersonPatronym    string
+	PersonDateOfBirth time.Time
+}
+
+type SearchLegalPersonContractsFilter struct {
+	ContractType  string
+	StartDateFrom time.Time
+	StartDateTo   time.Time
+
+	LegalPersonShortName string
+	LegalPersonName      string
+	LocalEDRPOU          uint32
 }

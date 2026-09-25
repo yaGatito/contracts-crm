@@ -5,7 +5,6 @@ import (
 	sqlitedb "contract-service/adapters/db"
 	"contract-service/models"
 	"contract-service/repo"
-	"fmt"
 )
 
 type ContractService struct {
@@ -14,12 +13,6 @@ type ContractService struct {
 	contractRepo            repo.ContractRepository
 	contractLegalPersonRepo *sqlitedb.ContractLegalPersonRepository
 	contractPersonRepo      *sqlitedb.ContractPersonRepository
-}
-
-type ContractDetails struct {
-	Contract     models.Contract
-	Persons      []models.Person
-	LegalPersons []models.LegalPerson
 }
 
 func NewContractService(pr repo.PersonRepository, lpr repo.LegalPersonRepository, cr repo.ContractRepository, clpr *sqlitedb.ContractLegalPersonRepository, cpr *sqlitedb.ContractPersonRepository) *ContractService {
@@ -44,8 +37,8 @@ func (cs *ContractService) DeletePerson(ctx context.Context, id uint) error {
 	return cs.personRepo.Delete(ctx, id)
 }
 
-func (cs *ContractService) CreateLegalPerson(ctx context.Context, legalPerson models.LegalPerson) error {
-	return cs.legalPersonRepo.Save(ctx, &legalPerson)
+func (cs *ContractService) CreateLegalPerson(ctx context.Context, legalPerson *models.LegalPerson) error {
+	return cs.legalPersonRepo.Save(ctx, legalPerson)
 }
 
 func (cs *ContractService) GetLegalPerson(ctx context.Context, id uint) (*models.LegalPerson, error) {
@@ -56,31 +49,26 @@ func (cs *ContractService) DeleteLegalPerson(ctx context.Context, id uint) error
 	return cs.legalPersonRepo.Delete(ctx, id)
 }
 
-func (cs *ContractService) CreateContract(ctx context.Context, contract models.Contract) error {
-	return cs.contractRepo.Save(ctx, &contract)
+func (cs *ContractService) CreateContract(ctx context.Context, contract *models.Contract) error {
+	return cs.contractRepo.Save(ctx, contract)
 }
 
-func (cs *ContractService) GetContractDetails(ctx context.Context, id uint) (ContractDetails, error) {
-	contract, err := cs.contractRepo.Get(ctx, id)
-	if err != nil {
-		return ContractDetails{}, fmt.Errorf("failed to get contract: %w", err)
-	}
+func (cs *ContractService) GetContractDetails(ctx context.Context, id uint) (models.ContractDetails, error) {
+	return cs.contractRepo.GetContractDetails(ctx, id)
+}
 
-	persons, err := cs.contractPersonRepo.GetPersonsByContractID(ctx, id)
-	if err != nil {
-		return ContractDetails{}, fmt.Errorf("failed to get persons: %w", err)
-	}
+func (cs *ContractService) SearchLegalPersonContracts(
+	ctx context.Context,
+	filter models.SearchLegalPersonContractsFilter,
+) ([]models.Contract, error) {
+	return cs.contractRepo.SearchLegalPersonContracts(ctx, filter)
+}
 
-	legalPersons, err := cs.contractLegalPersonRepo.GetLegalPersonsByContractID(ctx, id)
-	if err != nil {
-		return ContractDetails{}, fmt.Errorf("failed to get legalPersons: %w", err)
-	}
-
-	return ContractDetails{
-		Contract:     *contract,
-		Persons:      persons,
-		LegalPersons: legalPersons,
-	}, nil
+func (cs *ContractService) SearchPersonContracts(
+	ctx context.Context,
+	filter models.SearchPersonContractsFilter,
+) ([]models.Contract, error) {
+	return cs.contractRepo.SearchPersonContracts(ctx, filter)
 }
 
 func (cs *ContractService) UpdateContract(ctx context.Context, contract *models.Contract) error {

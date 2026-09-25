@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"contract-service/models"
 	"contract-service/service"
 
 	"github.com/gin-gonic/gin"
@@ -26,11 +27,13 @@ func (h *Handlers) Register(router *gin.Engine) {
 
 	persons := router.Group("/persons")
 	persons.POST("", h.createPerson)
+	persons.POST("/search", h.searchPersonContracts)
 	persons.GET(":id", h.getPerson)
 	persons.DELETE(":id", h.deletePerson)
 
 	legalPersons := router.Group("/legal-persons")
 	legalPersons.POST("", h.createLegalPerson)
+	legalPersons.POST("/search", h.searchLegalPersonContracts)
 	legalPersons.GET(":id", h.getLegalPerson)
 	legalPersons.DELETE(":id", h.deleteLegalPerson)
 
@@ -63,6 +66,30 @@ func (h *Handlers) createPerson(c *gin.Context) {
 	log.Printf("saved person with id: %d", person.ID)
 
 	c.JSON(http.StatusCreated, person)
+}
+
+func (h *Handlers) searchPersonContracts(c *gin.Context) {
+	var filter SearchPersonContractsFilter
+	if err := c.ShouldBindJSON(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	contracts, err := h.service.SearchPersonContracts(c.Request.Context(), models.SearchPersonContractsFilter{
+		ContractType:      filter.ContractType,
+		StartDateFrom:     filter.StartDateFrom,
+		StartDateTo:       filter.StartDateTo,
+		PersonName:        filter.PersonName,
+		PersonLastname:    filter.PersonLastname,
+		PersonPatronym:    filter.PersonPatronym,
+		PersonDateOfBirth: filter.PersonDateOfBirth,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, contracts)
 }
 
 func (h *Handlers) getPerson(c *gin.Context) {
@@ -103,7 +130,7 @@ func (h *Handlers) createLegalPerson(c *gin.Context) {
 
 	legalPerson := dtoToLegalPerson(dto)
 
-	if err := h.service.CreateLegalPerson(context.Background(), legalPerson); err != nil {
+	if err := h.service.CreateLegalPerson(context.Background(), &legalPerson); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -111,6 +138,31 @@ func (h *Handlers) createLegalPerson(c *gin.Context) {
 	log.Printf("saved legal person with id: %d", legalPerson.ID)
 
 	c.JSON(http.StatusCreated, legalPerson)
+}
+
+func (h *Handlers) searchLegalPersonContracts(c *gin.Context) {
+	var filter SearchLegalPersonContractsFilter
+	if err := c.ShouldBindJSON(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Printf("FILTER: %+v", filter)
+
+	contracts, err := h.service.SearchLegalPersonContracts(c.Request.Context(), models.SearchLegalPersonContractsFilter{
+		ContractType:         filter.ContractType,
+		StartDateFrom:        filter.StartDateFrom,
+		StartDateTo:          filter.StartDateTo,
+		LegalPersonShortName: filter.LegalPersonShortName,
+		LegalPersonName:      filter.LegalPersonName,
+		LocalEDRPOU:          filter.LocalEDRPOU,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, contracts)
 }
 
 func (h *Handlers) getLegalPerson(c *gin.Context) {
@@ -151,7 +203,7 @@ func (h *Handlers) createContract(c *gin.Context) {
 
 	contract := dtoToContract(dto)
 
-	if err := h.service.CreateContract(context.Background(), contract); err != nil {
+	if err := h.service.CreateContract(context.Background(), &contract); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

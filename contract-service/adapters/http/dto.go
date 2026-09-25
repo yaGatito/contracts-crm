@@ -7,7 +7,7 @@ import (
 
 type Contract struct {
 	ID        uint      `json:"id,omitempty"`
-	Number    int64     `json:"number"`
+	Number    uint64    `json:"number"`
 	StartDate time.Time `json:"start_date"`
 	EndDate   time.Time `json:"end_date"`
 	Type      string    `json:"type"`
@@ -19,7 +19,7 @@ type LegalPerson struct {
 	ShortName    string    `json:"shortname"`
 	RegisteredAt time.Time `json:"registered_at"`
 	LocalKWED    string    `json:"local_kwed"`
-	LocalEDRPOU  int32     `json:"local_edrpou"`
+	LocalEDRPOU  uint      `json:"local_edrpou"`
 }
 
 type Person struct {
@@ -28,7 +28,28 @@ type Person struct {
 	Name        string    `json:"name"`
 	Patronym    string    `json:"patronym"`
 	DateOfBirth time.Time `json:"date_of_birth"`
-	LocalRNOKPP int64     `json:"local_rnokpp"`
+	LocalRNOKPP uint64    `json:"local_rnokpp"`
+}
+
+type SearchPersonContractsFilter struct {
+	ContractType  string    `json:"contract_type"`
+	StartDateFrom time.Time `json:"start_date_from"`
+	StartDateTo   time.Time `json:"start_date_to"`
+
+	PersonName        string    `json:"person_name"`
+	PersonLastname    string    `json:"person_lastname"`
+	PersonPatronym    string    `json:"person_patronym"`
+	PersonDateOfBirth time.Time `json:"person_date_of_birth"`
+}
+
+type SearchLegalPersonContractsFilter struct {
+	ContractType  string    `json:"contract_type"`
+	StartDateFrom time.Time `json:"start_date_from"`
+	StartDateTo   time.Time `json:"start_date_to"`
+
+	LegalPersonShortName string `json:"legal_shortname"`
+	LegalPersonName      string `json:"legal_name"`
+	LocalEDRPOU          uint32 `json:"legal_edrpou"`
 }
 
 func personToDto(p models.Person) Person {
@@ -65,7 +86,6 @@ func contractToDto(c models.Contract) Contract {
 
 func dtoToPerson(dto Person) models.Person {
 	return models.Person{
-		ID:          dto.ID,
 		Lastname:    dto.Lastname,
 		Name:        dto.Name,
 		Patronym:    dto.Patronym,
@@ -76,7 +96,6 @@ func dtoToPerson(dto Person) models.Person {
 
 func dtoToLegalPerson(dto LegalPerson) models.LegalPerson {
 	return models.LegalPerson{
-		ID:           dto.ID,
 		Name:         dto.Name,
 		ShortName:    dto.ShortName,
 		RegisteredAt: dto.RegisteredAt,
@@ -87,7 +106,6 @@ func dtoToLegalPerson(dto LegalPerson) models.LegalPerson {
 
 func dtoToContract(dto Contract) models.Contract {
 	return models.Contract{
-		ID:        dto.ID,
 		Number:    dto.Number,
 		StartDate: dto.StartDate,
 		EndDate:   dto.EndDate,
