@@ -9,7 +9,7 @@ type LegalPerson struct {
 	ShortName    string
 	RegisteredAt time.Time
 	LocalKWED    string `gorm:"column:local_kwed"` // ex: 62.01
-	LocalERDPOU  int32  `gorm:"uniqueIndex"`       // 8-digit
+	LocalEDRPOU  int32  `gorm:"uniqueIndex"`       // 8-digit
 }
 
 type Person struct {
